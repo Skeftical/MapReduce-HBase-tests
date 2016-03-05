@@ -41,8 +41,8 @@ public class Task2Driver extends Configured implements Tool {
 //        job.setCombinerClass(ReducerTask2.class);
 //        job.setMapperClass(MapperTask2.class);
         job.setReducerClass(HBaseReducer.class);
-        job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(IntWritable.class);
+        job.setMapOutputKeyClass(LongWritable.class);
+        job.setMapOutputValueClass(LongWritable.class);
         if (args.length > 5){
             int numReducers = Integer.parseInt(args[5]);
             job.setNumReduceTasks(numReducers);
@@ -52,7 +52,7 @@ public class Task2Driver extends Configured implements Tool {
         scan.setCaching(100);
         scan.setCacheBlocks(false);
         TableMapReduceUtil.initTableMapperJob("BD4Project2Sample",scan, HBaseMapper.class,
-                ImmutableBytesWritable.class, IntWritable.class, job);
+                LongWritable.class, LongWritable.class, job);
 
 
 //        ChainMapper.addMapper(job, MapperTask2.class, LongWritable.class, Text.class, IntWritable.class
