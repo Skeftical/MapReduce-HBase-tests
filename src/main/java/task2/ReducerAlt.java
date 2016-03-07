@@ -13,9 +13,12 @@ public class ReducerAlt extends Reducer<LongWritable, LongWritable, LongWritable
     private PriorityQueue<CustomPairMods> pq = new PriorityQueue<CustomPairMods>();
     private int k;
 
+    @Override
     public void setup (Context context){
         k = Integer.parseInt(context.getConfiguration().get("k"));
     }
+
+    @Override
     public void reduce(LongWritable key, Iterable<LongWritable> values, Context context) throws IOException,InterruptedException {
 
         long modifications = 0;
@@ -32,7 +35,6 @@ public class ReducerAlt extends Reducer<LongWritable, LongWritable, LongWritable
     }
     @Override
     protected void cleanup(Context context) throws IOException, InterruptedException {
-        super.cleanup(context);
         CustomPairMods customPairMods;
         while(pq.size() > 0){
             customPairMods = pq.poll();

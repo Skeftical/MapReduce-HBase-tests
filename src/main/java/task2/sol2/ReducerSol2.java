@@ -1,16 +1,10 @@
 package task2.sol2;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.ReduceContext;
 import org.apache.hadoop.mapreduce.Reducer;
-import task1.CustomPair;
 import task2.CustomPairMods;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 
 
