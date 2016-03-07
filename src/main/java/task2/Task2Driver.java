@@ -38,63 +38,54 @@ public class Task2Driver extends Configured implements Tool {
         job.setJarByClass(Task2Driver.class);
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
-//        job.setCombinerClass(ReducerTask2.class);
-//        job.setMapperClass(MapperTask2.class);
-        job.setReducerClass(HBaseReducer.class);
-        job.setMapOutputKeyClass(LongWritable.class);
-        job.setMapOutputValueClass(LongWritable.class);
+        job.setCombinerClass(ReducerTask2.class);
         if (args.length > 5){
             int numReducers = Integer.parseInt(args[5]);
             job.setNumReduceTasks(numReducers);
         }
-        Scan scan = new Scan();
-        scan.addColumn(Bytes.toBytes("WD"), Bytes.toBytes("TITLE"));
-        scan.setCaching(100);
-        scan.setCacheBlocks(false);
-        TableMapReduceUtil.initTableMapperJob("BD4Project2Sample",scan, HBaseMapper.class,
-                LongWritable.class, LongWritable.class, job);
 
 
-//        ChainMapper.addMapper(job, MapperTask2.class, LongWritable.class, Text.class, IntWritable.class
-//        , IntWritable.class,getConf());
-//
-//        ChainReducer.setReducer(job,ReducerTask2.class, IntWritable.class, IntWritable.class, IntWritable.class
-//        , IntWritable.class, getConf());
-//
-//
-//        ChainReducer.addMapper(job, ChainMapper2.class, IntWritable.class, IntWritable.class, IntWritable.class,
-//                IntWritable.class, getConf());
+
+        ChainMapper.addMapper(job, MapperTask2.class, LongWritable.class, Text.class, IntWritable.class
+                , IntWritable.class,getConf());
+
+        ChainReducer.setReducer(job,ReducerTask2.class, IntWritable.class, IntWritable.class, IntWritable.class
+                , IntWritable.class, getConf());
+
+
+        ChainReducer.addMapper(job, ChainMapper2.class, IntWritable.class, IntWritable.class, IntWritable.class,
+                IntWritable.class, getConf());
 
 
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job, new Path(INTER_OUTPUT));
 
-//        Job job2 = new Job(getConf());
+        Job job2 = new Job(getConf());
 
-//        job2.setJarByClass(Task2Driver.class);
-//        job2.setJobName("TOPK");
-//        job2.setInputFormatClass(TextInputFormat.class);
-//        job2.setOutputFormatClass(TextOutputFormat.class);
-//        job2.setNumReduceTasks(1);
-//        job2.setMapperClass(MapperSol2.class);
-//        job2.setReducerClass(ReducerSol2.class);
-//        job2.setMapOutputKeyClass(IntWritable.class);
-//        job2.setMapOutputValueClass(IntWritable.class);
-//
-//        job2.setOutputKeyClass(IntWritable.class);
-//        job2.setOutputValueClass(IntWritable.class);
-//
-//        TextInputFormat.addInputPath(job2, new Path(INTER_OUTPUT));
-//        TextOutputFormat.setOutputPath(job2, new Path(args[1]));
+        job2.setJarByClass(Task2Driver.class);
+        job2.setJobName("TOPK");
+        job2.setInputFormatClass(TextInputFormat.class);
+        job2.setOutputFormatClass(TextOutputFormat.class);
+        job2.setNumReduceTasks(1);
+        job2.setMapperClass(MapperSol2.class);
+        job2.setReducerClass(ReducerSol2.class);
+        job2.setMapOutputKeyClass(IntWritable.class);
+        job2.setMapOutputValueClass(IntWritable.class);
+
+        job2.setOutputKeyClass(IntWritable.class);
+        job2.setOutputValueClass(IntWritable.class);
+
+        TextInputFormat.addInputPath(job2, new Path(INTER_OUTPUT));
+        TextOutputFormat.setOutputPath(job2, new Path(args[1]));
 
         job.getConfiguration().set("start",args[2]);
         job.getConfiguration().set("end",args[3]);
         String k = args[4];
         job.getConfiguration().set("k",k);
-//        job2.getConfiguration().set("k",k);
+        job2.getConfiguration().set("k",k);
 
-        List<Job> jobs = Lists.newArrayList(job);
+        List<Job> jobs = Lists.newArrayList(job, job2);
         int exitStatus = 0;
         for (Job vjob : jobs){
             boolean jobSuccessful = vjob.waitForCompletion(true);
