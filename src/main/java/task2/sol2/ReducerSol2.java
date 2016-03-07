@@ -1,6 +1,7 @@
 package task2.sol2;
 
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.ReduceContext;
@@ -16,7 +17,7 @@ import java.util.PriorityQueue;
 /**
  * Created by fotis on 01/02/16.
  */
-public class ReducerSol2 extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
+public class ReducerSol2 extends Reducer<LongWritable, LongWritable, LongWritable, LongWritable> {
     private PriorityQueue<CustomPairMods> pq = new PriorityQueue<CustomPairMods>();
     private int k;
 
@@ -25,14 +26,14 @@ public class ReducerSol2 extends Reducer<IntWritable, IntWritable, IntWritable, 
         k = Integer.parseInt(context.getConfiguration().get("k"));
     }
 
-    public void reduce(IntWritable key, Iterable<IntWritable> values, Context context) throws IOException,InterruptedException {
+    public void reduce(LongWritable key, Iterable<LongWritable> values, Context context) throws IOException,InterruptedException {
         int counter = 0; //More than one value ?
-        int articleId = key.get();
+        long articleId = key.get();
         CustomPairMods customPairMods = null;
 
         if (values.iterator().hasNext()){
             counter+=1;
-            int modifications = values.iterator().next().get();
+            long modifications = values.iterator().next().get();
             if (counter == 2){
                 throw new IOException();
             }
@@ -49,7 +50,7 @@ public class ReducerSol2 extends Reducer<IntWritable, IntWritable, IntWritable, 
         CustomPairMods customPairMods = null;
         while (pq.size() >0){
             customPairMods = pq.poll();
-            context.write(new IntWritable(customPairMods.getArticleId()), new IntWritable(customPairMods.getModifications()));
+            context.write(new LongWritable(customPairMods.getArticleId()), new LongWritable(customPairMods.getModifications()));
         }
     }
 }

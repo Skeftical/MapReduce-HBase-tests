@@ -6,18 +6,18 @@ package task2;
  * Created by fotis on 06/02/16.
  */
 public class CustomPairMods implements Comparable<CustomPairMods> {
-    private int articleId;
-    private int modifications;
+    private long articleId;
+    private long modifications;
 
-    public int getArticleId() {
+    public long getArticleId() {
         return articleId;
     }
 
-    public int getModifications() {
+    public long getModifications() {
         return modifications;
     }
 
-    public CustomPairMods(int articleId, int modifications) {
+    public CustomPairMods(long articleId, long modifications) {
         this.articleId = articleId;
         this.modifications = modifications;
     }
