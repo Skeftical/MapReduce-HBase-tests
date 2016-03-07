@@ -20,6 +20,9 @@ public class MapperTask2 extends Mapper<LongWritable, Text, IntWritable, IntWrit
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private Date startDate;
     private Date endDate;
+    static enum Counters {
+        MAP_PROCESSED_JOB2
+    }
     public void setup (Context context){
         df.setTimeZone(tz);
         try{
@@ -39,6 +42,7 @@ public class MapperTask2 extends Mapper<LongWritable, Text, IntWritable, IntWrit
                 Date date = df.parse(array[4]);
                 if ((date.compareTo(startDate)== 1) && date.compareTo(endDate)== -1){
                     //Sending article id and revision id
+                    context.getCounter(Counters.MAP_PROCESSED_JOB2).increment(1);
                     context.write(new IntWritable(Integer.parseInt(array[1])),new IntWritable(1));
                 }
             }catch (ParseException e){

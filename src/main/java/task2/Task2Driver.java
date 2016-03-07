@@ -76,7 +76,7 @@ public class Task2Driver extends Configured implements Tool {
         scan.setCaching(100);
         scan.setTimeRange(startDate.getTime(), endDate.getTime());
         scan.setCacheBlocks(false);
-        TableMapReduceUtil.initTableMapperJob("BD4Project2Sample",scan, HBaseMapper.class,
+        TableMapReduceUtil.initTableMapperJob("BD4Project2",scan, HBaseMapper.class,
                 LongWritable.class, LongWritable.class, job);
 
 
