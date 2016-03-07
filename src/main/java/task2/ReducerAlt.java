@@ -1,5 +1,6 @@
 package task2;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -9,7 +10,7 @@ import java.util.PriorityQueue;
 /**
  * Created by fotis on 04/03/16.
  */
-public class ReducerAlt extends Reducer<LongWritable, LongWritable, LongWritable, LongWritable> {
+public class ReducerAlt extends Reducer<LongWritable, IntWritable, LongWritable, IntWritable> {
     private PriorityQueue<CustomPairMods> pq = new PriorityQueue<CustomPairMods>();
     private int k;
 
@@ -19,10 +20,10 @@ public class ReducerAlt extends Reducer<LongWritable, LongWritable, LongWritable
     }
 
     @Override
-    public void reduce(LongWritable key, Iterable<LongWritable> values, Context context) throws IOException,InterruptedException {
+    public void reduce(LongWritable key, Iterable<IntWritable> values, Context context) throws IOException,InterruptedException {
 
-        long modifications = 0;
-        for (LongWritable val : values){
+        int modifications = 0;
+        for (IntWritable val : values){
             modifications+=val.get();
         }
         long articleId = key.get();
@@ -38,7 +39,7 @@ public class ReducerAlt extends Reducer<LongWritable, LongWritable, LongWritable
         CustomPairMods customPairMods;
         while(pq.size() > 0){
             customPairMods = pq.poll();
-            context.write(new LongWritable(customPairMods.getArticleId()), new LongWritable(customPairMods.getModifications()));
+            context.write(new LongWritable(customPairMods.getArticleId()), new IntWritable(customPairMods.getModifications()));
         }
     }
 }

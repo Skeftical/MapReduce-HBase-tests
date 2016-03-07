@@ -6,15 +6,10 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.chain.ChainMapper;
-import org.apache.hadoop.mapreduce.lib.chain.ChainReducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -64,10 +59,8 @@ public class Task2Driver extends Configured implements Tool {
         job.setJarByClass(Task2Driver.class);
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
-        job.setCombinerClass(ReducerTask2.class);
+        job.setCombinerClass(Combiner.class);
         job.setReducerClass(ReducerAlt.class);
-        job.setMapOutputKeyClass(LongWritable.class);
-        job.setMapOutputValueClass(LongWritable.class);
 
 
 
@@ -77,7 +70,7 @@ public class Task2Driver extends Configured implements Tool {
         scan.setTimeRange(startDate.getTime(), endDate.getTime());
         scan.setCacheBlocks(false);
         TableMapReduceUtil.initTableMapperJob("BD4Project2",scan, HBaseMapper.class,
-                LongWritable.class, LongWritable.class, job);
+                LongWritable.class, IntWritable.class, job);
 
 
 
@@ -95,10 +88,10 @@ public class Task2Driver extends Configured implements Tool {
         job2.setMapperClass(MapperSol2.class);
         job2.setReducerClass(ReducerSol2.class);
         job2.setMapOutputKeyClass(LongWritable.class);
-        job2.setMapOutputValueClass(LongWritable.class);
+        job2.setMapOutputValueClass(IntWritable.class);
 
         job2.setOutputKeyClass(LongWritable.class);
-        job2.setOutputValueClass(LongWritable.class);
+        job2.setOutputValueClass(IntWritable.class);
 
         TextInputFormat.addInputPath(job2, new Path(INTER_OUTPUT));
         TextOutputFormat.setOutputPath(job2, new Path(args[1]));
