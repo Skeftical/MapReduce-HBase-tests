@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.KeyOnlyFilter;
+import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -15,10 +18,15 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import task2.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by fotis on 31/01/16.
@@ -34,12 +42,26 @@ public class Task1Driver extends Configured implements Tool {
         job1.setJarByClass(Task1Driver.class);
 
 
-        if (args.length > 4){
-            int numReducers = Integer.parseInt(args[4]);
+        if (args.length > 3){
+            int numReducers = Integer.parseInt(args[3]);
             job1.setNumReduceTasks(numReducers);
         }
 
-        job1.setMapperClass(Map.class);
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        Date startDate = null;
+        Date endDate = null;
+
+        df.setTimeZone(tz);
+        try{
+            startDate = df.parse(args[1]);
+            endDate =  df.parse(args[2]);
+        }catch (Exception e){
+            System.out.println("Unable to parse dates passed as arguments");
+            return 1;
+        }
+
 
         job1.setReducerClass(Reduce.class);
         job1.setGroupingComparatorClass(CustomGroupingComparator.class);
@@ -59,12 +81,17 @@ public class Task1Driver extends Configured implements Tool {
         job1.setOutputValueClass(Text.class);
         job1.setOutputFormatClass(TextOutputFormat.class);
 
+        Scan scan = new Scan();
+//        scan.addColumn(Bytes.toBytes("WD"), Bytes.toBytes("TITLE"));
+        scan.setCaching(1000);
+        scan.setFilter(new KeyOnlyFilter());
+        scan.setTimeRange(startDate.getTime(), endDate.getTime());
+        scan.setCacheBlocks(false);
+        TableMapReduceUtil.initTableMapperJob("BD4Project2",scan, task1.HBaseMapper.class,
+                CustomPair.class, LongWritable.class, job1);
 
 
-        job1.getConfiguration().set("start",args[2]);
-        job1.getConfiguration().set("end",args[3]);
 
-        FileInputFormat.addInputPath(job1, new Path(args[0]));
         FileOutputFormat.setOutputPath(job1, new Path(INTER_OUTPUT));
 
 
@@ -80,7 +107,7 @@ public class Task1Driver extends Configured implements Tool {
         job2.setReducerClass(ReducerMerge.class);
         job2.setNumReduceTasks(1);
         FileInputFormat.addInputPath(job2, new Path(INTER_OUTPUT));
-        FileOutputFormat.setOutputPath(job2, new Path(args[1]));
+        FileOutputFormat.setOutputPath(job2, new Path(args[0]));
 
         int exitStatus = 0;
         List<Job> jobs = Lists.newArrayList(job1, job2);
@@ -99,7 +126,7 @@ public class Task1Driver extends Configured implements Tool {
     }
 
     public static void main(String[] args) throws Exception{
-        if (args.length < 4){
+        if (args.length < 3){
             System.out.println("Incorrect input");
             System.exit(0);
         }
