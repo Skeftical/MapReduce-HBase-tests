@@ -19,13 +19,17 @@ import java.util.TimeZone;
  */
 public class HBaseMapper extends TableMapper<LongWritable, IntWritable> {
     static enum Counters {
-        MAP_PROCESSED_RECORDS
+        MAP_PROCESSED_RECORDS,
+        MAP_MORETHANONE
     }
 
     @Override
     protected void map(ImmutableBytesWritable key, Result value, Context context) throws IOException, InterruptedException {
         context.getCounter(Counters.MAP_PROCESSED_RECORDS).increment(1);
         byte[] rowkey=value.getRow();
+        if (value.listCells().size() ==1){
+            context.getCounter(Counters.MAP_MORETHANONE).increment(1);
+        }
         long articleID = Bytes.toLong(Bytes.copy(rowkey, 0, 8));
         context.write(new LongWritable(articleID),new IntWritable(1));
 
