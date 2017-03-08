@@ -65,8 +65,8 @@ public class Task2Driver extends Configured implements Tool {
         job2.setNumReduceTasks(1);
         job2.setMapperClass(MapperSol2.class);
         job2.setReducerClass(ReducerSol2.class);
-        job2.setMapOutputKeyClass(CustomPairMods.class);
-        job2.setMapOutputValueClass(NullWritable.class);
+        job2.setMapOutputKeyClass(IntWritable.class);
+        job2.setMapOutputValueClass(IntWritable.class);
 
         job2.setOutputKeyClass(IntWritable.class);
         job2.setOutputValueClass(IntWritable.class);

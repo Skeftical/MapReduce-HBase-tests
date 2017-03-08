@@ -14,19 +14,17 @@ public class CustomPairMods implements WritableComparable<CustomPairMods> {
     private int articleId;
     private int modifications;
 
+    public CustomPairMods(int articleId, int modifications) {
+        this.articleId = articleId;
+        this.modifications = modifications;
+    }
+
     public int getArticleId() {
         return articleId;
     }
 
-
-
     public int getModifications() {
         return modifications;
-    }
-
-    public CustomPairMods(int articleId, int modifications) {
-        this.articleId = articleId;
-        this.modifications = modifications;
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.apache.hadoop.util.ToolRunner;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -118,7 +119,9 @@ public class WordCountV2 extends Configured implements Tool {
         for (int i=0; i<args.length; ++i){
             if ("-skip".equals(args[i])) {
                 job.getConfiguration().setBoolean("wordcount.skip.patterns", true);
-                DistributedCache.addCacheFile(new Path(args[++i]).toUri(), job.getConfiguration());
+
+                DistributedCache.addCacheFile(new URI(args[++i]), job.getConfiguration());
+                System.out.println(DistributedCache.getCacheFiles(job.getConfiguration())[0].toString());
             }else {
                 otherArgs.add(args[i]);
             }
